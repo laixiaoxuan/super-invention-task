@@ -19,10 +19,8 @@ package com.nokia.radio;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,29 +35,29 @@ import java.util.Arrays;
  *
  */
 public class Starter
- {
-    /**
+{
+	/**
 	 * slf4j logger interface
 	 */
 	protected static final transient Logger LOG = LoggerFactory.getLogger(Starter.class);
-	
+
 	/**
 	 * Start process.
 	 */
 	private static void start() throws Exception
 	{
-		String hostName =  InetAddress.getLocalHost().getHostName();
-		if (new File("../bin/" +hostName+ ".pid").exists()) 
+		String hostName = InetAddress.getLocalHost().getHostName();
+		if (new File("../bin/" + hostName + ".pid").exists())
 		{
-			throw new Exception("Pid file already exist: "+ Files.readFirstLine(new File("../bin/" + hostName + ".pid"),Charset.defaultCharset()));
+			throw new Exception("Pid file already exist: " + Files.readFirstLine(new File("../bin/" + hostName + ".pid"), Charset.defaultCharset()));
 		}
-		Files.write(Tools.getPid(), new File("../bin/" + hostName+ ".pid"),Charset.defaultCharset());
+		Files.write(Tools.getPid(), new File("../bin/" + hostName + ".pid"), Charset.defaultCharset());
 		LOG.info("###############TASK \"DEMO TASK\" START####################");
 		new Thread(new SimpleTask()).start();
-		while(Thread.activeCount()>1)
+		while (Thread.activeCount() > 1)
 		{
 			//Waiting simple task thread finish.
-			Thread.sleep(200);	
+			Thread.sleep(200);
 		}
 		LOG.info("###############TASK \"DEMO TASK\" END####################");
 		new File("../bin/" + hostName + ".pid").deleteOnExit();
@@ -68,19 +66,19 @@ public class Starter
 	/**
 	 * Stop process.
 	 */
-	private static void stop() throws Exception 
+	private static void stop() throws Exception
 	{
-		String hostName =  InetAddress.getLocalHost().getHostName();
+		String hostName = InetAddress.getLocalHost().getHostName();
 		String os = System.getProperties().getProperty("os.name");
 		LOG.info("os.name-->" + os);
-		String pid = Files.readFirstLine(new File("../bin/" + hostName + ".pid"),Charset.defaultCharset());
-		ProcessBuilder processBuilder=null;
-		if (os.indexOf("indows") > -1) 
+		String pid = Files.readFirstLine(new File("../bin/" + hostName + ".pid"), Charset.defaultCharset());
+		ProcessBuilder processBuilder = null;
+		if (os.indexOf("indows") > -1)
 		{
 			//windows
 			LOG.info("tskill " + pid + " /A /V");
 			processBuilder = new ProcessBuilder("tskill", pid, "/A", "/V");
-		} else 
+		} else
 		{
 			//linux
 			LOG.info("kill -9 " + pid);
@@ -88,9 +86,9 @@ public class Starter
 		}
 		Process process = processBuilder.start();
 		String line;
-		try (BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()));) 
+		try (BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()));)
 		{
-			while ((line = in.readLine()) != null) 
+			while ((line = in.readLine()) != null)
 			{
 				LOG.info(line);
 			}
@@ -99,16 +97,21 @@ public class Starter
 		new File("../bin/" + hostName + ".pid").deleteOnExit();
 	}
 
-    /**
+	/**
 	 * Main.
 	 */
 	public static void main(String[] args) throws Exception
 	{
-		switch (args[0]) 
+		switch (args[0])
 		{
-		case "start":start();break;
-		case "stop":stop();break;
-		default: throw new Exception(Arrays.toString(args));
+		case "start":
+			start();
+			break;
+		case "stop":
+			stop();
+			break;
+		default:
+			throw new Exception(Arrays.toString(args));
 		}
 	}
 
